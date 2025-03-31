@@ -40,7 +40,7 @@ def make_character():
         "Max HP": 5,
         "Level": 1,
         "XP": 0,
-        "XP to next": 5
+        "XP to next": 3,
     }
 
 
@@ -131,8 +131,11 @@ def level_up(character):
 def gain_xp(character, amount):
     character["XP"] += amount
     print(f"You gained {amount} XP!")
-    while character["XP"] >= character["XP to next"]:
-        level_up(character)
+
+    # Check if we should level up (but no automatic win at level 3)
+    if character["Level"] < 3:
+        while character["XP"] >= character["XP to next"]:
+            level_up(character)
 
 
 def check_for_foe(character):
@@ -183,7 +186,10 @@ def riddle_game(character):
         ("What gets wetter as it dries?", "towel"),
         ("What has hands but can't clap?", "clock"),
         ("What runs but never walks?", "water"),
-        ("I speak without a mouth and hear without ears. What am I?", "echo")
+        ("I speak without a mouth and hear without ears. What am I?", "echo"),
+        ("What has a head and tail, but no body?", "coin"),
+        ("What breaks when you say it?", "silence"),
+        ("What goes up but never comes down", "age")
     ]
     question, answer = random.choice(riddles)
     print("Riddle Challenge:")
@@ -199,13 +205,19 @@ def riddle_game(character):
 
 def game_loop(board, character):
     while is_alive(character):
+        # ✅ Win condition for Level 3: either XP >= 15 OR reached (4, 4)
+        if character["Level"] == 3:
+            if character["XP"] >= 21:
+                print("\n👑 YOU WIN! Your wisdom and strength have surpassed all expectations!")
+                print_game_over_banner()
+                return
+            elif (character["X"], character["Y"]) == (4, 4):
+                print("\n👑 YOU WIN! You have conquered the final chamber of Patiala House!")
+                print_game_over_banner()
+                return
+
         describe_current_location(board, character)
         draw_map(character)
-
-        if character["Level"] == 3 and (character["X"], character["Y"]) == (4, 4):
-            print("\n👑 YOU WIN! You conquered all 3 levels!")
-            print_game_over_banner()
-            return
 
         if character["Level"] == 3 and random.random() < 0.33:
             print("A strange whisper asks you a question...")
@@ -242,15 +254,16 @@ def game_loop(board, character):
                 else:
                     riddle_game(character)
 
-            # Gain XP or Level up if standing on goal square and not already at max level
+            # ✅ XP gain or level up if on goal square and not at level 3
             if (character["X"], character["Y"]) == (4, 4):
                 if character["Level"] < 3:
                     print("You feel stronger after reaching the end of the maze.")
-                    gain_xp(character, 3)  # Instant level up
+                    gain_xp(character, 3)
         else:
             print("You can't go that way!")
 
     print("\n💀 Game Over. You ran out of HP.")
+
 
 
 def print_game_over_banner():
