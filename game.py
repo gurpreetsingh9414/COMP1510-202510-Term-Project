@@ -296,7 +296,7 @@ def check_for_foe(character):
     :postcondition: randomly returns True with a chance based on level (25% if < 3, 33% if 3)
     :return: true if a foe appears; False otherwise
     """
-    chance = 0.25 if character["Level"] < 3 else 0.33
+    chance = 0.30 if character["Level"] < 3 else 0.35
     return random.random() < chance
 
 
