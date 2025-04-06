@@ -2,7 +2,7 @@
 Gurpreet Singh
 A01405950
 """
-
+from itertools import product
 import random
 
 
@@ -39,11 +39,10 @@ def make_board(rows, columns):
         green + "THE MAURYA TREASURY - Gold coins stamped with the seal of Chandragupta Maurya are scattered across the floor.\nBut beware — the wealth is guarded by mechanical traps rumored to have been designed by Chanakya himself." + reset
     ]
 
-    board = {}
-    for row in range(rows):
-        for column in range(columns):
-            board[(row, column)] = random.choice(descriptions)
-    return board
+    return {
+        (row, column): random.choice(descriptions)
+        for row, column in product(range(rows), range(columns))
+    }
 
 
 def make_character():
@@ -302,26 +301,28 @@ def check_for_foe(character):
 
 def number_guessing_game(character):
     """
-        Launch a number guessing mini-game where the player guesses a number between 1 and 5.
+    Launch a number guessing mini-game where the player guesses a number between 1 and 5.
 
-        :param character: a dictionary representing the player with at least 'HP' and 'XP' keys
-        :precondition: character must include 'HP', 'XP', 'Level', and 'XP to next'
-        :postcondition: if the player guesses correctly, they gain 2 XP; otherwise, they lose 1 HP
-                        invalid inputs are also penalized with -1 HP
-
-        """
+    :param character: a dictionary representing the player with at least 'HP' and 'XP' keys
+    :precondition: character must include 'HP', 'XP', 'Level', and 'XP to next'
+    :postcondition: if the player guesses correctly, they gain 2 XP; otherwise, they lose 1 HP
+                    invalid inputs are also penalized with -1 HP
+    """
     print("Number guessing challenge!")
     answer = random.randint(1, 5)
+    print("Guess (1-5): ", end='')
+
     try:
-        guess = int(input("Guess (1-5): "))
-        if guess == answer:
-            print("Correct!")
-            gain_xp(character, 2)
-        else:
-            print("Wrong! -1 HP")
-            character["HP"] -= 1
+        guess = int(input())
     except ValueError:
-        print("Invalid! -1 HP")
+        character["HP"] -= 1
+        return print("Invalid! -1 HP")
+
+    if guess == answer:
+        print("Correct!")
+        gain_xp(character, 2)
+    else:
+        print("Wrong! -1 HP")
         character["HP"] -= 1
 
 
